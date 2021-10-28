@@ -1,3 +1,4 @@
+{-# LANGUAGE ConstraintKinds #-}
 module Fcf.Singleton.Core where
 
 import Fcf.Core
@@ -6,6 +7,8 @@ import Data.Proxy
 import GHC.TypeLits
 
 newtype SExp t a = SExp { eval :: t (Eval a) }
+
+instance RepWithT f k t => RepWithT f (Exp k) (SExp t)
 
 repack :: Eval a ~ Eval b => SExp t a -> SExp t b
 repack = SExp . eval
@@ -56,6 +59,11 @@ rep = rep' @t @a
 data SBool :: Bool -> * where
   SFalse :: SBool 'False
   STrue  :: SBool 'True
+
+data SOrd :: Ordering -> * where
+  SLT :: SOrd 'LT
+  SEQ :: SOrd 'EQ
+  SGT :: SOrd 'GT
 
 deriving instance Show (SBool b)
 
